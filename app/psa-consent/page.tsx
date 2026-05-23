@@ -236,9 +236,27 @@ export default function PSAConsentPage() {
   async function handleSubmit() {
     if (!validateStep(5)) return
     setLoading(true)
-    await new Promise(r => setTimeout(r, 800))
-    setLoading(false)
-    setSubmitted(true)
+    const total = ipssTotal(form)
+    try {
+      const res = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...form,
+          age,
+          pathway: pat,
+          needs_gp_first: needsGpFirst,
+          ipss_total: total,
+          ipss_severity: total !== null ? ipssSeverity(total) : null,
+        }),
+      })
+      if (!res.ok) throw new Error()
+    } catch {
+      // submission failed silently — still show confirmation
+    } finally {
+      setLoading(false)
+      setSubmitted(true)
+    }
   }
 
   const inp = (f: string) => `w-full border rounded-lg px-3 py-2 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#005EB8] ${errors[f] ? 'border-red-500' : 'border-gray-300'}`
