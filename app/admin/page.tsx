@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { GROUP_LABELS, GROUP_COLOURS, Group } from '@/lib/codeGenerator'
 
 type Submission = {
   id: string
@@ -20,6 +21,8 @@ type Submission = {
   reason: string
   active_uti: string
   bone_pain: string
+  code: string
+  group: Group
 }
 
 function calcAge(dob: string) {
@@ -110,7 +113,11 @@ export default function AdminPage() {
           <div className="bg-white rounded-xl shadow-md overflow-hidden">
             <div className="bg-[#005EB8] px-6 py-4">
               <h2 className="text-white font-bold text-lg">{selected.patient_name}</h2>
-              <p className="text-blue-200 text-xs mt-1">Submitted {formatDate(selected.submitted_at)} · Ref: {selected.id}</p>
+              <p className="text-blue-200 text-xs mt-1">Submitted {formatDate(selected.submitted_at)}</p>
+              <div className="flex items-center gap-3 mt-2">
+                {selected.group && <Badge label={GROUP_LABELS[selected.group]} colour={GROUP_COLOURS[selected.group]} />}
+                {selected.code && <span className="font-mono text-white font-bold tracking-widest text-sm">{selected.code}</span>}
+              </div>
             </div>
             <div className="px-6 py-5 space-y-4">
 
@@ -185,7 +192,8 @@ export default function AdminPage() {
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide">Patient</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide">Age</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide">Submitted</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide">Pathway</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide">Group</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide">Code</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide">Flags</th>
                   </tr>
                 </thead>
@@ -195,7 +203,10 @@ export default function AdminPage() {
                       <td className="px-4 py-3 font-semibold text-gray-900">{s.patient_name}</td>
                       <td className="px-4 py-3 text-gray-600">{calcAge(s.patient_dob)}</td>
                       <td className="px-4 py-3 text-gray-500 text-xs">{formatDate(s.submitted_at)}</td>
-                      <td className="px-4 py-3 text-gray-700 capitalize">{s.pathway || '—'}</td>
+                      <td className="px-4 py-3">
+                        {s.group && <Badge label={GROUP_LABELS[s.group]} colour={GROUP_COLOURS[s.group]} />}
+                      </td>
+                      <td className="px-4 py-3 font-mono text-sm font-semibold text-gray-700">{s.code || '—'}</td>
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap gap-1">
                           {s.prefer_gp_appointment && <Badge label="GP appt" colour="bg-blue-100 text-blue-700" />}

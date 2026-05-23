@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   try {
     const container = getContainer()
     const { resources } = await container.items
-      .query('SELECT c.id, c.submitted_at, c.patient_name, c.patient_dob, c.patient_email, c.patient_chi, c.pathway, c.prefer_gp_appointment, c.needs_gp_first, c.ipss_total, c.ipss_severity, c.on_finasteride, c.on_dutasteride, c.family_history, c.reason, c.active_uti, c.bone_pain, c.ethnicity, c.symptoms FROM c ORDER BY c.submitted_at DESC')
+      .query('SELECT c.id, c.submitted_at, c.patient_name, c.patient_dob, c.patient_email, c.patient_chi, c.pathway, c.prefer_gp_appointment, c.needs_gp_first, c.ipss_total, c.ipss_severity, c.on_finasteride, c.on_dutasteride, c.family_history, c.reason, c.active_uti, c.bone_pain, c.ethnicity, c.symptoms, c.code, c.group FROM c ORDER BY c.submitted_at DESC')
       .fetchAll()
 
     return NextResponse.json(resources)

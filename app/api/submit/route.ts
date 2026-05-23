@@ -31,6 +31,8 @@ export async function POST(req: NextRequest) {
       bone_pain: body.bone_pain || '',
       ethnicity: body.ethnicity || '',
       symptoms: body.symptoms || [],
+      code: body.code || '',
+      group: body.group || '',
       data: body,
     }
 

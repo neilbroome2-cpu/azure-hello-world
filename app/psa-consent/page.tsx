@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { generateCode, GROUP_LABELS, GROUP_COLOURS, getGroup } from '@/lib/codeGenerator'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -166,7 +167,7 @@ export default function PSAConsentPage() {
   const [errors, setErrors] = useState<Partial<Record<string, string>>>({})
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
-  const [submissionId] = useState<string>(() => Math.random().toString(36).substring(2, 10).toUpperCase())
+  const [code, setCode] = useState('')
 
   const age = calcAge(form.dob)
   const pat = pathway(age, form.clinical_fitness)
@@ -237,8 +238,10 @@ export default function PSAConsentPage() {
     if (!validateStep(5)) return
     setLoading(true)
     const total = ipssTotal(form)
+    const submissionCode = generateCode({ ...form, pathway: pat }, age)
+    setCode(submissionCode)
     try {
-      const res = await fetch('/api/submit', {
+      await fetch('/api/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -248,9 +251,10 @@ export default function PSAConsentPage() {
           needs_gp_first: needsGpFirst,
           ipss_total: total,
           ipss_severity: total !== null ? ipssSeverity(total) : null,
+          code: submissionCode,
+          group: getGroup({ ...form, pathway: pat }, age),
         }),
       })
-      if (!res.ok) throw new Error()
     } catch {
       // submission failed silently — still show confirmation
     } finally {
@@ -275,8 +279,9 @@ export default function PSAConsentPage() {
             </div></div>
             <h1 className="text-xl font-bold text-gray-900 mb-3">We&apos;ll be in touch</h1>
             <p className="text-gray-700 text-sm mb-4">Thank you, <strong>{form.name}</strong>. We&apos;ve noted that you&apos;d like to speak with a GP first. One of our team will contact you to arrange a suitable time.</p>
-            <p className="text-gray-600 text-sm mb-6">You can also call us on <strong>01383 850212</strong>.</p>
-            <p className="text-xs text-gray-400 mb-4">Reference: {submissionId}</p>
+            <p className="text-gray-600 text-sm mb-4">You can also call us on <strong>01383 850212</strong>.</p>
+            {code && <p className="font-mono text-lg font-bold text-gray-800 tracking-widest mb-1">{code}</p>}
+            <p className="text-xs text-gray-400 mb-4">Quote this code if you contact us</p>
             <Link href="/" className="inline-block bg-[#005EB8] text-white font-semibold px-6 py-2 rounded-lg hover:bg-[#004a93] transition-colors text-sm">Back to Oakley Medical Practice</Link>
           </div>
         </div>
@@ -305,8 +310,9 @@ export default function PSAConsentPage() {
             </ul>
           </div>
 
-          <p className="text-gray-600 text-sm mb-6">Any questions? Call us on <strong>01383 850212</strong>.</p>
-          <p className="text-xs text-gray-400 mb-4">Reference: {submissionId}</p>
+          <p className="text-gray-600 text-sm mb-4">Any questions? Call us on <strong>01383 850212</strong>.</p>
+          {code && <p className="font-mono text-lg font-bold text-gray-800 tracking-widest mb-1">{code}</p>}
+          <p className="text-xs text-gray-400 mb-4">Quote this code if you contact us</p>
           <Link href="/" className="inline-block bg-[#005EB8] text-white font-semibold px-6 py-2 rounded-lg hover:bg-[#004a93] transition-colors text-sm">Back to Oakley Medical Practice</Link>
         </div>
       </div>
