@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { CosmosClient } from '@azure/cosmos'
-import { Resend } from 'resend'
+import { EmailClient } from '@azure/communication-email'
 
 function getContainer() {
   const client = new CosmosClient(process.env.COSMOS_CONNECTION_STRING!)
@@ -129,16 +129,22 @@ export async function POST(req: NextRequest) {
 
     await container.items.create(doc)
 
-    // Send email notification
-    if (process.env.RESEND_API_KEY) {
+    // Send email notification via Azure Communication Services
+    if (process.env.ACS_CONNECTION_STRING && process.env.EMAIL_FROM) {
       try {
-        const resend = new Resend(process.env.RESEND_API_KEY)
-        await resend.emails.send({
-          from: process.env.EMAIL_FROM || 'PSA Consent <onboarding@resend.dev>',
-          to: 'neil.broome@nhs.scot',
-          subject: `PSA Consent — ${doc.patient_name} [${doc.code}]`,
-          html: buildEmailHtml(doc),
-        })
+        const emailClient = new EmailClient(process.env.ACS_CONNECTION_STRING)
+        const message = {
+          senderAddress: process.env.EMAIL_FROM,
+          content: {
+            subject: `PSA Consent — ${doc.patient_name} [${doc.code}]`,
+            html: buildEmailHtml(doc),
+          },
+          recipients: {
+            to: [{ address: 'neil.broome@nhs.scot' }],
+          },
+        }
+        const poller = await emailClient.beginSend(message)
+        await poller.pollUntilDone()
       } catch (emailErr) {
         console.error('Email send error:', emailErr)
         // Don't fail the submission if email fails
