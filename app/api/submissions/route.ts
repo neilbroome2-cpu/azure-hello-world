@@ -21,6 +21,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(resources)
   } catch (err) {
     console.error('Submissions error:', err)
-    return NextResponse.json({ error: 'Failed to fetch submissions' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch submissions', detail: String(err) }, { status: 500 })
   }
 }
