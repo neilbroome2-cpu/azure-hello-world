@@ -9,7 +9,7 @@ function getContainer() {
 export async function GET(req: NextRequest) {
   const password = req.headers.get('x-admin-password')
   if (password !== process.env.ADMIN_PASSWORD) {
-    return new NextResponse(JSON.stringify({ got: password, stored_length: process.env.ADMIN_PASSWORD?.length }), { status: 401 })
+    return new NextResponse('Unauthorized', { status: 401 })
   }
 
   try {
@@ -21,6 +21,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(resources)
   } catch (err) {
     console.error('Submissions error:', err)
-    return NextResponse.json({ error: 'Failed to fetch submissions', detail: String(err) }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch submissions' }, { status: 500 })
   }
 }
