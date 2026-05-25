@@ -9,7 +9,7 @@ function getContainer() {
 export async function GET(req: NextRequest) {
   const password = req.headers.get('x-admin-password')
   if (password !== process.env.ADMIN_PASSWORD) {
-    return new NextResponse('Unauthorized', { status: 401 })
+    return new NextResponse(JSON.stringify({ got: password, stored_length: process.env.ADMIN_PASSWORD?.length }), { status: 401 })
   }
 
   try {
