@@ -4,7 +4,7 @@ import { EmailClient } from '@azure/communication-email'
 
 function getContainer() {
   const client = new CosmosClient(process.env.COSMOS_CONNECTION_STRING!)
-  return client.database('psa_submissions').container('oakley')
+  return client.database('psa_submissions').container('Oakley')
 }
 
 function calcAge(dob: string): string {
