@@ -3,7 +3,7 @@ import { CosmosClient } from '@azure/cosmos'
 
 function getContainer() {
   const client = new CosmosClient(process.env.COSMOS_CONNECTION_STRING!)
-  return client.database('oakley').container('psa_submissions')
+  return client.database('psa_submissions').container('oakley')
 }
 
 export async function GET(req: NextRequest) {
